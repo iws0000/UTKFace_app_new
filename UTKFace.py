@@ -6,8 +6,7 @@ from tensorflow.keras.preprocessing import image
 
 import numpy as np
 
-
-IM_HEIGHT=198
+image_size=198 #修正
 
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -38,15 +37,15 @@ def upload_file():
             #受け取った画像を読み込み、np形式に変換
             img = image.load_img(filepath, target_size=(image_size,image_size))
             img = image.img_to_array(img)
-            data = np.array([img])
+            img = np.array([img])
             
-            img = cv2.imread(filepath)
-            b,g,r = cv2.split(img)
-            img = cv2.merge([r,g,b])
-            img = cv2.resize(img, (IM_HEIGHT,IM_WIDTH))
+            # img = cv2.imread(filepath)
+            # b,g,r = cv2.split(img)
+            # img = cv2.merge([r,g,b])
+            # img = cv2.resize(img, (IM_HEIGHT,IM_WIDTH))
             
             #変換したデータをモデルに渡して予測する
-            result = model.predict(img)[0]
+            result = model.predict(img)[0][0]
             pred_answer =  str(result)  + "years old."
 
             return render_template("index.html",answer=pred_answer)
