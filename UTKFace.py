@@ -5,9 +5,17 @@ from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.preprocessing import image
 
 import numpy as np
+import subprocess 
 
+# モデルをダウンロードするコマンドを実行する
+command = '''
+curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=1ICiciVdYM9VIfJXKRhBbpZGD6UIooDq6" > /dev/null
+CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)" 
+curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=1ICiciVdYM9VIfJXKRhBbpZGD6UIooDq6" -o my_model.h5
+'''    
+subprocess.run(command, shell=True)
 
-IM_HEIGHT=198
+image_size=198 #修正
 
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -36,17 +44,17 @@ def upload_file():
             filepath = os.path.join(UPLOAD_FOLDER, filename)
 
             #受け取った画像を読み込み、np形式に変換
-            img = image.load_img(filepath, target_size=(image_size,image_size))
+            img = image.load_img(filepath, grayscale=False, target_size=(image_size,image_size))
             img = image.img_to_array(img)
-            data = np.array([img])
+            img = np.array([img])
             
-            img = cv2.imread(filepath)
-            b,g,r = cv2.split(img)
-            img = cv2.merge([r,g,b])
-            img = cv2.resize(img, (IM_HEIGHT,IM_WIDTH))
+            # img = cv2.imread(filepath)
+            # b,g,r = cv2.split(img)
+            # img = cv2.merge([r,g,b])
+            # img = cv2.resize(img, (IM_HEIGHT,IM_WIDTH))
             
             #変換したデータをモデルに渡して予測する
-            result = model.predict(img)[0]
+            result = model.predict(img)[0][0]
             pred_answer =  str(result)  + "years old."
 
             return render_template("index.html",answer=pred_answer)
@@ -57,3 +65,4 @@ def upload_file():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 8080))
     app.run(host ='0.0.0.0',port = port)
+
