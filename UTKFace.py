@@ -12,10 +12,11 @@ command = '''
 curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=1o0ltPnpnjT7Ml-GK_UAQ37qXvi_PL8C9" > /dev/null
 CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)" 
 curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=1o0ltPnpnjT7Ml-GK_UAQ37qXvi_PL8C9" -o my_model.h5
-'''    
+'''
+
 subprocess.run(command, shell=True)
 
-image_size=198 #修正
+image_size=198
 
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
@@ -25,8 +26,12 @@ app = Flask(__name__)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-model = load_model('./my_model.h5')#学習済みモデルをロード
-
+#import h5py
+#model= h5py.File('./my_model.h5')
+#import h5py
+#model = h5py.File('./my_model.h5', 'r')
+model = load_model('/Users/iwas/Desktop/UTKFace_app_new/my_model.keras')
+#model = load_model('/Users/iwas/Desktop/UTKFace_app_new/model.h5',compile=False)
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
@@ -47,11 +52,6 @@ def upload_file():
             img = image.load_img(filepath, grayscale=False, target_size=(image_size,image_size))
             img = image.img_to_array(img)
             img = np.array([img])
-            
-            # img = cv2.imread(filepath)
-            # b,g,r = cv2.split(img)
-            # img = cv2.merge([r,g,b])
-            # img = cv2.resize(img, (IM_HEIGHT,IM_WIDTH))
             
             #変換したデータをモデルに渡して予測する
             result = model.predict(img)[0][0]
