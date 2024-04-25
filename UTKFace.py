@@ -30,7 +30,7 @@ def allowed_file(filename):
 #model= h5py.File('./my_model.h5')
 #import h5py
 #model = h5py.File('./my_model.h5', 'r')
-model = load_model('/Users/iwas/Desktop/UTKFace_app_new/my_model.keras')
+model = load_model('./my_model.keras')
 #model = load_model('/Users/iwas/Desktop/UTKFace_app_new/model.h5',compile=False)
 
 @app.route('/', methods=['GET', 'POST'])
